@@ -2,43 +2,33 @@
 
 import React, { useState } from 'react';
 
-export default function TestPage() {
-  const [isBlack, setIsBlack] = useState(false);
-
-  const toggleBackground = () => {
-    setIsBlack(!isBlack);
-  };
+export default function Page() {
+  const [dark, setDark] = useState(false);
 
   return (
     <div style={{
-      backgroundColor: isBlack ? '#000000' : '#ffffff',
-      color: isBlack ? '#ffffff' : '#000000',
-      minHeight: '100vh',
+      backgroundColor: dark ? '#000000' : '#ffffff',
+      color: dark ? '#ffffff' : '#000000',
+      height: '100vh',
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
-      transition: 'background-color 0.3s ease',
-      fontFamily: 'sans-serif'
+      transition: '0.3s'
     }}>
-      <h1>Teste de Cor: AetherHub</h1>
-      <p>O fundo atual é: <strong>{isBlack ? 'Preto' : 'Branco'}</strong></p>
-      
-      <button
-        onClick={toggleBackground}
+      <h1>Teste de Cor AetherHub</h1>
+      <button 
+        onClick={() => setDark(!dark)}
         style={{
-          padding: '15px 30px',
-          fontSize: '16px',
+          padding: '10px 20px',
           cursor: 'pointer',
-          borderRadius: '8px',
-          border: '2px solid',
-          borderColor: isBlack ? '#ffffff' : '#000000',
-          backgroundColor: 'transparent',
-          color: 'inherit',
-          fontWeight: 'bold'
+          border: '1px solid',
+          borderColor: dark ? '#fff' : '#000',
+          background: 'transparent',
+          color: 'inherit'
         }}
       >
-        Mudar para {isBlack ? 'Branco' : 'Preto'}
+        Mudar para {dark ? 'Branco' : 'Preto'}
       </button>
     </div>
   );
