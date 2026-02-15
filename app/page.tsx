@@ -1,36 +1,41 @@
-'use client';
-import React, { useState } from 'react';
+'use client'
+
+import React from 'react'
 
 export default function Page() {
-  const [dark, setDark] = useState(false);
+  const [isBlack, setIsBlack] = React.useState(false)
 
   return (
     <div style={{
-      backgroundColor: dark ? '#000000' : '#ffffff',
-      color: dark ? '#ffffff' : '#000000',
-      height: '100vh',
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
-      transition: '0.3s',
-      fontFamily: 'sans-serif'
+      minHeight: '60vh',
+      backgroundColor: isBlack ? '#000' : '#fff',
+      color: isBlack ? '#fff' : '#000',
+      transition: 'all 0.3s ease',
+      borderRadius: '8px',
+      border: '1px solid #eaeaea'
     }}>
-      <h1>AetherHub Ativo</h1>
+      <h2>Bem-vindo ao AetherHub</h2>
+      <p>Este é o seu painel de biblioteca em construção.</p>
+      
       <button 
-        onClick={() => setDark(!dark)}
+        onClick={() => setIsBlack(!isBlack)}
         style={{
           padding: '10px 20px',
+          fontSize: '16px',
           cursor: 'pointer',
-          borderRadius: '8px',
-          border: '1px solid',
-          borderColor: dark ? '#fff' : '#000',
-          background: 'transparent',
-          color: 'inherit'
+          marginTop: '20px',
+          borderRadius: '5px',
+          border: 'none',
+          backgroundColor: isBlack ? '#fff' : '#333',
+          color: isBlack ? '#000' : '#fff'
         }}
       >
-        Mudar para {dark ? 'Branco' : 'Preto'}
+        Mudar para {isBlack ? 'Branco' : 'Preto'}
       </button>
     </div>
-  );
+  )
 }
