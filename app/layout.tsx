@@ -1,11 +1,13 @@
-import {
-  ClerkProvider,
-  SignInButton,
-  SignedIn,
-  SignedOut,
-  UserButton
-} from '@clerk/nextjs'
+import { ClerkProvider } from '@clerk/nextjs'
+import { Inter } from 'next/font/google'
 import './globals.css'
+
+const inter = Inter({ subsets: ['latin'] })
+
+export const metadata = {
+  title: 'AetherHub',
+  description: 'Sua biblioteca de RPG',
+}
 
 export default function RootLayout({
   children,
@@ -15,19 +17,21 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="pt-br">
-        <body>
-          <header style={{ display: 'flex', justifyContent: 'space-between', padding: '20px', borderBottom: '1px solid #ccc' }}>
-            <h1>AetherHub</h1>
-            <SignedOut>
-              <SignInButton mode="modal">
-                <button style={{ padding: '8px 16px', cursor: 'pointer' }}>Entrar</button>
-              </SignInButton>
-            </SignedOut>
-            <SignedIn>
-              <UserButton afterSignOutUrl="/" />
-            </SignedIn>
+        <body className={inter.className}>
+          <header style={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center',
+            padding: '1rem 2rem', 
+            borderBottom: '1px solid #eaeaea',
+            backgroundColor: '#fff'
+          }}>
+            <h1 style={{ fontSize: '1.5rem', margin: 0 }}>AetherHub</h1>
+            <nav>
+              {/* O Clerk gerencia os botões de login automaticamente aqui */}
+            </nav>
           </header>
-          <main>
+          <main style={{ padding: '2rem' }}>
             {children}
           </main>
         </body>
