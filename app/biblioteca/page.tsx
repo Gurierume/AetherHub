@@ -1,27 +1,29 @@
-import { SignInButton, SignedIn, SignedOut } from "@clerk/nextjs";
-import Link from "next/link";
+import { UserButton, SignOutButton } from "@clerk/nextjs";
 
-export default function HomePage() {
-  return (
-    <main style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', fontFamily: 'sans-serif' }}>
-      <h1>AetherHub</h1>
-      <p>Gerencie seus decks de forma profissional.</p>
-
-      <SignedOut>
-        <SignInButton mode="modal">
-          <button style={{ padding: '10px 20px', cursor: 'pointer', backgroundColor: '#0070f3', color: '#fff', border: 'none', borderRadius: '5px' }}>
-            Entrar com Google
-          </button>
-        </SignInButton>
-      </SignedOut>
-
-      <SignedIn>
-        <Link href="/biblioteca">
-          <button style={{ padding: '10px 20px', cursor: 'pointer', backgroundColor: '#28a745', color: '#fff', border: 'none', borderRadius: '5px' }}>
-            Acessar Minha Biblioteca
-          </button>
-        </Link>
-      </SignedIn>
-    </main>
-  );
-}
+// ... dentro do return
+<header style={{ 
+  display: "flex", 
+  justifyContent: "space-between", 
+  alignItems: "center", 
+  borderBottom: "1px solid #eaeaea",
+  paddingBottom: "1rem" 
+}}>
+  <div>
+    <h1 style={{ margin: 0 }}>AetherHub</h1>
+    <p style={{ color: "#666" }}>Bem-vindo de volta, <strong>{user?.firstName || user?.emailAddresses[0].emailAddress}</strong>!</p>
+  </div>
+  <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
+    <SignOutButton redirectUrl="/">
+      <button style={{ 
+        padding: "8px 12px", 
+        cursor: "pointer", 
+        border: "1px solid #ccc", 
+        borderRadius: "4px",
+        backgroundColor: "white" 
+      }}>
+        Sair da Conta
+      </button>
+    </SignOutButton>
+    <UserButton afterSignOutUrl="/" />
+  </div>
+</header>
