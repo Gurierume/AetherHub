@@ -23,7 +23,11 @@ export default async function BibliotecaPage() {
     "use server";
     await supabase
       .from('decks')
-      .insert([{ nome: 'Nova Ficha Estratégica', usuario_id: user?.id }]);
+      .insert([{ 
+        nome: 'Nova Ficha Estratégica', 
+        usuario_id: user?.id,
+        tema_id: 'base' // Já preparando para o sistema de skins
+      }]);
     revalidatePath('/biblioteca');
   }
 
