@@ -1,21 +1,21 @@
-import { UserButton, SignOutButton } from "@clerk/nextjs";
-import { currentUser } from "@clerk/nextjs/server";
-import { createClient } from "@supabase/supabase-js";
-import { revalidatePath } from "next/cache";
+import { Botão do usuário, Botão de saída de assinatura } from "@clerk/nextjs";
+import { Usuário atual } from "@clerk/nextjs/servidor";
+import { criarCliente } from "@supabase/supabase-js";
+import { revalidarCaminho } from "next/cache";
 
-const supabase = createClient(
+const supabase = criarCliente(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-export default async function BibliotecaPage() {
-  const user = await currentUser();
+export default async function BibliotecaPágina() {
+  const usuário = await Usuário atual();
 
   // Buscar as fichas do usuário no Supabase
   const { data: fichas } = await supabase
     .from('decks')
     .select('*')
-    .eq('usuario_id', user?.id)
+    .eq('usuario_id', usuário?.id)
     .order('created_at', { ascending: false });
 
   // Função para criar uma nova ficha
@@ -23,8 +23,8 @@ export default async function BibliotecaPage() {
     "use server";
     await supabase
       .from('decks')
-      .insert([{ nome: 'Nova Ficha Estratégica', usuario_id: user?.id }]);
-    revalidatePath('/biblioteca');
+      .insert([{ nome: 'Nova Ficha Estratégica', usuario_id: usuário?.id }]);
+    revalidarCaminho('/biblioteca');
   }
 
   // Função para remover uma ficha
@@ -34,8 +34,8 @@ export default async function BibliotecaPage() {
       .from('decks')
       .delete()
       .eq('id', id)
-      .eq('usuario_id', user?.id);
-    revalidatePath('/biblioteca');
+      .eq('usuario_id', usuário?.id);
+    revalidarCaminho('/biblioteca');
   }
 
   return (
@@ -43,13 +43,13 @@ export default async function BibliotecaPage() {
       <header style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid #eaeaea", paddingBottom: "1rem" }}>
         <div>
           <h1 style={{ margin: 0 }}>AetherHub</h1>
-          <p style={{ color: "#666" }}>Bem-vindo à sua coleção, <strong>{user?.firstName || "Explorador"}</strong></p>
+          <p style={{ color: "#666" }}>Bem-vindo à sua coleção, <strong>{usuário?.firstName || "Explorador"}</strong></p>
         </div>
         <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
-          <SignOutButton redirectUrl="/">
+          <Botão de saída de assinatura redirectUrl="/">
             <button style={{ padding: "8px 12px", cursor: "pointer", border: "1px solid #ccc", borderRadius: "4px" }}>Sair</button>
-          </SignOutButton>
-          <UserButton afterSignOutUrl="/" />
+          </Botão de saída de assinatura>
+          <Botão do usuário afterSignOutUrl="/" />
         </div>
       </header>
 
@@ -70,13 +70,15 @@ export default async function BibliotecaPage() {
               border: "1px solid #ddd", 
               borderRadius: "10px", 
               backgroundColor: "#fff",
-              boxShadow: "0 4px 6px rgba(0,0,0,0.05)"
+              boxShadow: "0 4px 6px rgba(0,0,0,0.05)",
+              position: "relative"
             }}>
               <h3 style={{ margin: "0 0 10px 0", fontSize: "1.1rem" }}>{ficha.nome}</h3>
               <p style={{ fontSize: "0.85rem", color: "#888" }}>
                 Criada em: {new Date(ficha.created_at).toLocaleDateString('pt-BR')}
               </p>
               
+              {/* Formulário de Remoção com Confirmação Nativa */}
               <form 
                 action={removerFicha.bind(null, ficha.id)} 
                 onSubmit={(e) => {
@@ -94,7 +96,8 @@ export default async function BibliotecaPage() {
                   padding: "6px 8px", 
                   cursor: "pointer",
                   fontSize: "0.75rem",
-                  width: "100%"
+                  width: "100%",
+                  transition: "all 0.2s"
                 }}>
                   🗑️ Remover Ficha
                 </button>
