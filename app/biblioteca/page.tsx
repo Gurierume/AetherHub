@@ -11,7 +11,7 @@ const supabase = createClient(
 
 export default async function BibliotecaPage() {
   const user = await currentUser();
-  if (!user) return <div style={{ padding: "2rem" }}>Carregando...</div>;
+  if (!user) return <div style={{ padding: "2rem" }}>Verificando sessão...</div>;
 
   const { data: fichas } = await supabase
     .from('decks')
@@ -31,29 +31,44 @@ export default async function BibliotecaPage() {
     revalidatePath('/biblioteca');
   }
 
+  async function removerFicha(formData: FormData) {
+    "use server";
+    const id = formData.get("id");
+    await supabase.from('decks').delete().eq('id', id);
+    revalidatePath('/biblioteca');
+  }
+
   return (
     <div style={{ padding: "2rem", maxWidth: "1000px", margin: "0 auto", fontFamily: "sans-serif" }}>
-      <header style={{ display: "flex", justifyContent: "space-between", borderBottom: "1px solid #eee", paddingBottom: "1rem" }}>
+      <header style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid #eee", paddingBottom: "1rem" }}>
         <h1>Minha Estante de Fichas</h1>
         <UserButton afterSignOutUrl="/" />
       </header>
       
-      <div style={{ marginTop: "2rem" }}>
-        <form action={criarFicha}>
-          <button type="submit" style={{ padding: "12px 24px", backgroundColor: "#0070f3", color: "white", border: "none", borderRadius: "8px", cursor: "pointer", fontWeight: "bold" }}>
-            + Criar Nova Ficha
-          </button>
-        </form>
-      </div>
+      <form action={criarFicha} style={{ marginTop: "2rem" }}>
+        <button type="submit" style={{ padding: "12px 24px", backgroundColor: "#0070f3", color: "white", border: "none", borderRadius: "8px", cursor: "pointer", fontWeight: "bold" }}>
+          + Criar Nova Ficha
+        </button>
+      </form>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "1rem", marginTop: "2rem" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))", gap: "1.5rem", marginTop: "2rem" }}>
         {fichas?.map((ficha) => (
-          <div key={ficha.id} style={{ padding: "1rem", border: "2px solid #0070f3", borderRadius: "12px", textAlign: "center" }}>
-            {/* O BOTÃO AZUL: Link para a ficha dinâmica */}
-            <Link href={`/biblioteca/${ficha.id}`} style={{ textDecoration: 'none', color: '#0070f3', fontWeight: 'bold', fontSize: '1.1rem' }}>
+          <div key={ficha.id} style={{ padding: "1.5rem", border: "1px solid #ddd", borderRadius: "12px", backgroundColor: "#fff", boxShadow: "0 2px 4px rgba(0,0,0,0.05)" }}>
+            <Link href={`/biblioteca/${ficha.id}`} style={{ textDecoration: 'none', color: '#0070f3', fontWeight: 'bold', fontSize: '1.2rem', display: 'block', marginBottom: '10px' }}>
               {ficha.nome}
             </Link>
-            <p style={{ fontSize: "0.8rem", color: "#666" }}>ID: {ficha.id.substring(0,8)}</p>
+            
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "15px" }}>
+              <span style={{ fontSize: "0.7rem", color: "#999" }}>ID: {ficha.id.substring(0,8)}</span>
+              
+              {/* BOTÃO REMOVER COM CONFIRMAÇÃO */}
+              <form action={removerFicha} onSubmit="return confirm('Tem certeza que deseja apagar esta ficha? Esta ação não pode ser desfeita.')">
+                <input type="hidden" name="id" value={ficha.id} />
+                <button type="submit" style={{ backgroundColor: "transparent", color: "#ff4d4f", border: "1px solid #ff4d4f", padding: "5px 10px", borderRadius: "4px", cursor: "pointer", fontSize: "0.8rem" }}>
+                  Remover
+                </button>
+              </form>
+            </div>
           </div>
         ))}
       </div>
