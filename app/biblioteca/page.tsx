@@ -34,11 +34,8 @@ export default async function BibliotecaPage() {
   async function removerFicha(formData: FormData) {
     "use server";
     const id = formData.get("id");
-    // Removendo apenas se o ID existir
-    if (id) {
-      await supabase.from('decks').delete().eq('id', id);
-      revalidatePath('/biblioteca');
-    }
+    await supabase.from('decks').delete().eq('id', id);
+    revalidatePath('/biblioteca');
   }
 
   return (
@@ -66,16 +63,7 @@ export default async function BibliotecaPage() {
               
               <form action={removerFicha}>
                 <input type="hidden" name="id" value={ficha.id} />
-                <button 
-                  type="submit" 
-                  style={{ backgroundColor: "transparent", color: "#ff4d4f", border: "1px solid #ff4d4f", padding: "5px 10px", borderRadius: "4px", cursor: "pointer", fontSize: "0.8rem" }}
-                  // Usamos o formAction com um pequeno truque de confirmação para evitar erro de tipo
-                  formAction={async (formData) => {
-                    "use server";
-                    // Esta é uma alternativa segura para o build
-                    await removerFicha(formData);
-                  }}
-                >
+                <button type="submit" style={{ backgroundColor: "transparent", color: "#ff4d4f", border: "1px solid #ff4d4f", padding: "5px 10px", borderRadius: "4px", cursor: "pointer", fontSize: "0.8rem" }}>
                   Remover
                 </button>
               </form>
