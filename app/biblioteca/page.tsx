@@ -1,4 +1,4 @@
-import { UserButton, SignOutButton } from "@clerk/nextjs";
+import { UserButton } from "@clerk/nextjs";
 import { currentUser } from "@clerk/nextjs/server";
 import { createClient } from "@supabase/supabase-js";
 import { revalidatePath } from "next/cache";
@@ -11,10 +11,7 @@ const supabase = createClient(
 
 export default async function BibliotecaPage() {
   const user = await currentUser();
-
-  if (!user || !process.env.NEXT_PUBLIC_SUPABASE_URL) {
-    return <div style={{ padding: "2rem" }}>Carregando perfil...</div>;
-  }
+  if (!user) return <div style={{ padding: "2rem" }}>Carregando...</div>;
 
   const { data: fichas } = await supabase
     .from('decks')
@@ -27,45 +24,39 @@ export default async function BibliotecaPage() {
     const userAuth = await currentUser();
     if (!userAuth) return;
     await supabase.from('decks').insert([{ 
-      nome: 'Nova Ficha Estratégica', 
+      nome: 'Nova Ficha de Herói', 
       usuario_id: userAuth.id,
       tema_id: 'base' 
     }]);
     revalidatePath('/biblioteca');
   }
 
-  async function removerFicha(id: string) {
-    "use server";
-    const userAuth = await currentUser();
-    if (!userAuth) return;
-    await supabase.from('decks').delete().eq('id', id).eq('usuario_id', userAuth.id);
-    revalidatePath('/biblioteca');
-  }
-
   return (
-    <div style={{ padding: "2rem", maxWidth: "1200px", margin: "0 auto", fontFamily: "sans-serif" }}>
-      <header style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid #eaeaea", paddingBottom: "1rem" }}>
-        <h1>AetherHub</h1>
-        <div style={{ display: "flex", gap: "1rem" }}><UserButton afterSignOutUrl="/" /></div>
+    <div style={{ padding: "2rem", maxWidth: "1000px", margin: "0 auto", fontFamily: "sans-serif" }}>
+      <header style={{ display: "flex", justifyContent: "space-between", borderBottom: "1px solid #eee", paddingBottom: "1rem" }}>
+        <h1>Minha Estante de Fichas</h1>
+        <UserButton afterSignOutUrl="/" />
       </header>
-      <main style={{ marginTop: "2rem" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "2rem" }}>
-          <h2>Minhas Fichas</h2>
-          <form action={criarFicha}><button type="submit" style={{ padding: "10px 20px", backgroundColor: "#0070f3", color: "white", border: "none", borderRadius: "5px", cursor: "pointer" }}>+ Nova Ficha</button></form>
-        </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))", gap: "1.5rem" }}>
-          {fichas?.map((ficha) => (
-            <div key={ficha.id} style={{ padding: "1.5rem", border: "1px solid #ddd", borderRadius: "10px" }}>
-              <Link href={`/biblioteca/${ficha.id}`} style={{ textDecoration: 'none', color: '#0070f3' }}>
-                <h3 style={{ margin: "0 0 10px 0" }}>{ficha.nome}</h3>
-              </Link>
-              <form action={removerFicha.bind(null, ficha.id)}>
-                <button type="submit" style={{ color: "#ff4d4f", background: "none", border: "1px solid #ffccc7", padding: "5px", width: "100%", cursor: "pointer" }}>🗑️ Remover</button>
-              </form>
-            </div>
-          ))}
-        </div>
-      </main>
+      
+      <div style={{ marginTop: "2rem" }}>
+        <form action={criarFicha}>
+          <button type="submit" style={{ padding: "12px 24px", backgroundColor: "#0070f3", color: "white", border: "none", borderRadius: "8px", cursor: "pointer", fontWeight: "bold" }}>
+            + Criar Nova Ficha
+          </button>
+        </form>
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "1rem", marginTop: "2rem" }}>
+        {fichas?.map((ficha) => (
+          <div key={ficha.id} style={{ padding: "1rem", border: "2px solid #0070f3", borderRadius: "12px", textAlign: "center" }}>
+            {/* O BOTÃO AZUL: Link para a ficha dinâmica */}
+            <Link href={`/biblioteca/${ficha.id}`} style={{ textDecoration: 'none', color: '#0070f3', fontWeight: 'bold', fontSize: '1.1rem' }}>
+              {ficha.nome}
+            </Link>
+            <p style={{ fontSize: "0.8rem", color: "#666" }}>ID: {ficha.id.substring(0,8)}</p>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
