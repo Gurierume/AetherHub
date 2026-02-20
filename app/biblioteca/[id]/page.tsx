@@ -1,6 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { currentUser } from "@clerk/nextjs/server";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL || '',
@@ -11,33 +12,59 @@ export default async function FichaPage({ params }: { params: { id: string } }) 
   const user = await currentUser();
   const { id } = params;
 
-  // Busca os detalhes da ficha específica
+  // Busca os dados da ficha no Supabase
   const { data: ficha, error } = await supabase
     .from('decks')
     .select('*')
     .eq('id', id)
     .single();
 
+  // Se a ficha não existir ou houver erro, mostra página 404
   if (!ficha || error) {
-    return <div style={{ padding: "2rem" }}>Ficha não encontrada.</div>;
+    return notFound();
   }
 
   return (
-    <div style={{ padding: "2rem", maxWidth: "800px", margin: "0 auto", fontFamily: "sans-serif" }}>
-      <Link href="/biblioteca" style={{ color: "#0070f3", textDecoration: "none" }}>← Voltar para Biblioteca</Link>
-      
-      <header style={{ marginTop: "2rem", borderBottom: "2px solid #eee", paddingBottom: "1rem" }}>
-        <h1>{ficha.nome}</h1>
-        <p>ID da Ficha: {id}</p>
-        <p>Tema Atual: <strong>{ficha.tema_id}</strong></p>
+    <div style={{ padding: "2rem", maxWidth: "900px", margin: "0 auto", fontFamily: "sans-serif", color: "#333" }}>
+      <header style={{ marginBottom: "2rem", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <Link href="/biblioteca" style={{ color: "#0070f3", textDecoration: "none" }}>← Minha Biblioteca</Link>
+        <span style={{ backgroundColor: "#eee", padding: "5px 10px", borderRadius: "15px", fontSize: "0.8rem" }}>
+          Tema: {ficha.tema_id}
+        </span>
       </header>
 
-      <section style={{ marginTop: "2rem" }}>
-        {/* Aqui entra a estrutura da ficha (Atributos, Inventário, etc) */}
-        <div style={{ padding: "20px", border: "1px dashed #ccc", borderRadius: "8px", textAlign: "center" }}>
-           <p>Área de Edição da Ficha (Em breve)</p>
+      <main style={{ backgroundColor: "#fff", border: "1px solid #ddd", borderRadius: "12px", padding: "2rem", boxShadow: "0 4px 6px rgba(0,0,0,0.05)" }}>
+        <h1 style={{ margin: "0 0 0.5rem 0", color: "#000" }}>{ficha.nome}</h1>
+        <p style={{ color: "#666", fontSize: "0.9rem", marginBottom: "2rem" }}>Criado em: {new Date(ficha.created_at).toLocaleDateString('pt-BR')}</p>
+
+        <hr style={{ border: "0", borderTop: "1px solid #eee", margin: "2rem 0" }} />
+
+        {/* ESTRUTURA BASE DA FICHA */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2rem" }}>
+          <section>
+            <h2 style={{ fontSize: "1.2rem", marginBottom: "1rem" }}>Atributos</h2>
+            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", padding: "10px", backgroundColor: "#f9f9f9", borderRadius: "8px" }}>
+                <span>💪 Força</span>
+                <strong>10</strong>
+              </div>
+              <div style={{ display: "flex", justifyContent: "space-between", padding: "10px", backgroundColor: "#f9f9f9", borderRadius: "8px" }}>
+                <span>🎯 Destreza</span>
+                <strong>10</strong>
+              </div>
+              <div style={{ display: "flex", justifyContent: "space-between", padding: "10px", backgroundColor: "#f9f9f9", borderRadius: "8px" }}>
+                <span>🧠 Inteligência</span>
+                <strong>10</strong>
+              </div>
+            </div>
+          </section>
+
+          <section>
+            <h2 style={{ fontSize: "1.2rem", marginBottom: "1rem" }}>Informações</h2>
+            <p style={{ color: "#666" }}>Aqui você poderá adicionar a história, equipamentos e magias do seu personagem conforme avançarmos.</p>
+          </section>
         </div>
-      </section>
+      </main>
     </div>
   );
 }
